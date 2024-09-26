@@ -1,19 +1,19 @@
 import groovy.transform.Field
 
 @Field def isContainerRunning() {
-    return sh script: "docker inspect --format='{{.State.Running}}' $(docker ps -q --filter ancestor=api_calc)", returnStdout: true
+    return sh script: """
+        docker inspect --format='{{.State.Running}}' $(docker ps -q --filter ancestor=api_calc)
+    """, returnStdout: true
 }
 
 pipeline {
     agent any
-    
-    stages {        
+    stages {
         stage('Stop') {
-
-            when { expression { !isContainerRunning().trim().equals('true') } } 
-                steps {
-                    echo '[*] Stopping the operation of the docker container'
-                    sh 'docker stop $(docker ps -q --filter ancestor=api_calc)'  
+            when { expression { !isContainerRunning().trim().equals('true') } }
+            steps {
+                echo '[*] Stopping the operation of the docker container'
+                sh 'docker stop $(docker ps -q --filter ancestor=api_calc)'
             }
         }
 
