@@ -1,6 +1,4 @@
-import groovy.transform.Field
-
-@Field def isContainerRunning() {
+def isContainerRunning() {
     sh script: """
         docker inspect --format='{{.State.Running}}' \$(docker ps -q --filter ancestor=api_calc)
     """, returnStdout: true
