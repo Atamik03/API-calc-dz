@@ -5,28 +5,28 @@ pipeline {
       stage('Stop') {
             steps {
                 echo '[*] Stopping the operation of the docker container'
-                sh 'docker stop $(docker ps -q --filter ancestor=APICalc)'  
+                sh 'docker stop $(docker ps -q --filter ancestor=api_calc)'  
             }
         }
 
       stage('Building') {
             steps {
                 echo '[*] Building a new docker container'
-                sh 'docker build -t APICalc:latest .'
-                sh 'docker run -d -p 8000:8000 APICalc'
+                sh 'docker build -t api_calc:latest .'
+                sh 'docker run -d -p 8000:8000 api_calc'
             }
         }
 
     stage('Bandit') {
         steps {
         sh 'sleep 20'
-        sh 'docker run --rm APICalc:latest bandit -r . -lll'
+        sh 'docker run --rm api_calc:latest bandit -r . -lll'
         }
     }
 
     stage('Semgrep') {
         steps {
-          sh 'docker run --rm APICalc:latest semgrep --config semgrep-config.yaml .'
+          sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
         }  
     }
     }
