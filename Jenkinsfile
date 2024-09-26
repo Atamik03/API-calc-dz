@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 @Field def isContainerRunning() {
-    return sh script: "docker inspect --format='{{.State.Running}}' $(docker ps -q --filter ancestor=api_calc)", returnStdout: true
+    sh script: "docker inspect --format='{{.State.Running}}' $(docker ps -q --filter ancestor=api_calc)", returnStdout: true
 }
 
 pipeline {
