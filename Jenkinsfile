@@ -5,7 +5,7 @@ pipeline {
       stage('Stop') {
             steps {
                 echo '[*] Stopping the operation of the docker container'
-                sh 'docker stop $(docker ps -q --filter ancestor=api_calc)'  
+                sh 'docker stop `docker ps -q --filter ancestor=api_calc`'  
             }
         }
 
