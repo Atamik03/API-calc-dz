@@ -1,9 +1,16 @@
 // name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
-def name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
+
 
 pipeline {
     agent any
     stages {      
+
+        stage('Name')
+            steps {
+                script {
+                    def name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
+                }
+            }
 
         stage('Stop') {
             steps {
@@ -18,7 +25,7 @@ pipeline {
         stage('Building') {
             steps {
                 echo '[] Building a new docker container'
-                sh "docker build -t ${env.D_NAME}:latest ."
+                sh "docker build -t $name:latest ."
                 sh "docker run -d -p ${env.RM_PORT}:${env.RM_PORT} --name ${env.NAME} ${env.D_NAME}:latest" 
             }
         }
