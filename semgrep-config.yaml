@@ -1,44 +1,49 @@
-pipeline {
-    agent any
-    stages {        
+rules:
+  - id: fastapi-unsafe-route
+    pattern: |
+      @app.get($PATH)
+      def $FUNC_NAME($PARAMS):
+          ...
+    message: "Проверьте безопасность маршрута FastAPI. Убедитесь, что параметры запроса безопасны."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      technology: fastapi
 
-	      stage('test') {
-            steps {
-                echo 'testing'
-                sh 'docker stop $(docker ps -q --filter ancestor=apicalc)' 
-                
-            }
-        }
+  - id: fastapi-unsafe-post
+    pattern: |
+      @app.post($PATH)
+      def $FUNC_NAME($PARAMS):
+          ...
+    message: "Проверьте безопасность POST-запроса FastAPI. Убедитесь, что параметры тела запроса безопасны."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      technology: fastapi
 
-	      stage('build') {
-            steps {
-                echo 'building'
-                sh 'docker build -t apicalc:latest .'
-                sh 'docker run -d -p 8001:8001 apicalc'
+  - id: fastapi-unsafe-query-params
+    pattern: |
+      @app.get($PATH)
+      def $FUNC_NAME($PARAMS):
+          ... # Здесь используется параметр запроса
+          $QUERY_PARAM = request.query_params[$QUERY_PARAM_NAME]
+    message: "Проверьте, что параметры запроса проверяются и безопасны."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      technology: fastapi
 
-            }
-        }
-
-	      stage('bandit') {
-	          steps {
-		            sh 'sleep 20'
-	            	sh 'docker run --rm apicalc:latest bandit -r . -lll'
-	          }
-	      }
-
-        stage('semgrep') {
-            steps {
-                sh 'docker run --rm apicalc:latest semgrep --config semgrep-config.yaml .'
-            }	
-        }
-    }
-
-    post {
-        success {
-            echo 'Docker image built and pushed successfully!!'
-        }
-        failure {
-            echo 'Something went wrong with the build.'
-        }
-    }
-}
+  - id: fastapi-unsafe-body
+    pattern: |
+      @app.post($PATH)
+      def $FUNC_NAME(body: $BODY_TYPE):
+          ...
+    message: "Проверьте, что тело запроса проверяется на безопасность."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      technology: fastapi
