@@ -13,7 +13,11 @@ pipeline {
         stage('Stop') {
             when { expression { isContainerRunning() } } 
             steps { 
-                // fff
+                // sh script: '''
+                //     if [[ "$(docker ps -q --filter ancestor=api_calc)" != "" ]]; then
+                //         docker stop $(docker ps -q --filter ancestor=api_calc)
+                //     fi
+                // '''
             }
         }
 
