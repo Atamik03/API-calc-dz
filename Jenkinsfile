@@ -10,6 +10,7 @@ pipeline {
                     echo '[] Stopping the operation of the docker container'
                     sh "docker stop $NAME" 
                     sh "docker rm $NAME" 
+                }
             }
         }
 
