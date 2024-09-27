@@ -22,19 +22,20 @@ pipeline {
             steps {
                 echo 'Building a new docker container'
                 sh 'docker build -t api_calc:latest .'
-                sh 'docker run -d -p 8000:8000 api_calc'
+                sh 'docker run -d -p 8000:8000 api_calc -i', returnStdout: true
+                def containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
             }
         }
 
         stage('Bandit') {
             steps {
-                sh 'docker exec -it api_calc bandit -r . -lll' 
+                sh 'docker exec -it ${containerId} bandit -r . -lll' 
             }
         }
 
         stage('Semgrep') {
             steps {
-                sh 'docker exec -it api_calc semgrep --config semgrep-config.yaml .'
+                sh 'docker exec -it ${containerId} semgrep --config semgrep-config.yaml .'
             }  
         }
     }
