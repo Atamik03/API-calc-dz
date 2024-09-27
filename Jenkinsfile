@@ -3,16 +3,16 @@ pipeline {
     stages {      
 
         stage('Read .env file') {
-            steps {
-                script {
-                    def envVars = [:] 
-                    readFile('.env').split('\n').each { line ->
-                        if (line.contains('=')) {
-                            def parts = line.split('=')
-                            envVars[parts[0].trim()] = parts[1].trim() 
+           steps {
+               script {
+                   def envVars = [:] 
+                   readFile(file: '.env').split('\n').each { line ->
+                       if (line.contains('=')) {
+                           def parts = line.split('=')
+                           envVars[parts[0].trim()] = parts[1].trim() 
                         }
                     }
-                    env.putAll(envVars)
+                   env.putAll(envVars)
                 }
             } 
         }
