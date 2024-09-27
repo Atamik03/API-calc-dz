@@ -12,6 +12,9 @@ pipeline {
     stages {
         stage('Stop') {
             when { expression { isContainerRunning() } } 
+            steps { 
+                // fff
+            }
         }
 
         stage('BuildAndRun') {
