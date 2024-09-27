@@ -5,9 +5,14 @@ pipeline {
         stage('Read .env file') {
             steps {
                 script {
-                    env.putAll(readFile('/mnt/hgfs/Ob_Ubuntu/APICalc/.env').split('\n').collectEntries {
-                    it.split('=')
-                })
+                    def envVars = [:] 
+                    readFile('.env').split('\n').each { line ->
+                        if (line.contains('=')) {
+                            def parts = line.split('=')
+                            envVars[parts[0].trim()] = parts[1].trim() 
+                        }
+                    }
+                    env.putAll(envVars)
                 }
             } 
         }
