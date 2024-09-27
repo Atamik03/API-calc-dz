@@ -6,6 +6,7 @@ pipeline {
             steps {
                 script {
                     Name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
+                    echo "$NAME"
                     echo '[] Stopping the operation of the docker container'
                     sh "docker stop $NAME" 
                     sh "docker rm $NAME" 
