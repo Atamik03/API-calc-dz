@@ -23,7 +23,9 @@ pipeline {
                 echo 'Building a new docker container'
                 sh script: 'docker build -t api_calc:latest .'
                 sh script: 'docker run -d -p 8000:8000 api_calc -i', returnStdout: true
-                containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
+                script {
+                    containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
+                }
             }
         }
 
