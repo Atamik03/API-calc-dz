@@ -4,15 +4,16 @@ pipeline {
 
         stage('Load .env file') {
             steps {
-                sh script: 'source .env', returnStatus: true 
+                sh script: 'source .env', returnStatus: true, executable: '/bin/bash' 
             }
         }
 
         stage('Stop') {
             steps {
                 echo '[] Stopping the operation of the docker container'
-                sh "docker stop ${env.NAME}" 
-                sh "docker rm ${env.NAME}" 
+                sh "echo \$NAME" 
+                sh "docker stop $NAME" 
+                sh "docker rm $NAME" 
             }
         }
 
