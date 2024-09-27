@@ -1,49 +1,41 @@
 rules:
-  - id: fastapi-unsafe-route
+  - id: unsafe-api-route
     pattern: |
       @app.get($PATH)
       def $FUNC_NAME($PARAMS):
           ...
     message: "Проверьте безопасность маршрута FastAPI. Убедитесь, что параметры запроса безопасны."
     severity: WARNING
-    languages: [python]
-    metadata:
-      category: security
-      technology: fastapi
+    languages:
+      - python
 
-  - id: fastapi-unsafe-post
+  - id: unsafe-api-post
     pattern: |
       @app.post($PATH)
       def $FUNC_NAME($PARAMS):
           ...
     message: "Проверьте безопасность POST-запроса FastAPI. Убедитесь, что параметры тела запроса безопасны."
     severity: WARNING
-    languages: [python]
-    metadata:
-      category: security
-      technology: fastapi
+    languages:
+      - python
 
-  - id: fastapi-unsafe-query-params
+  - id: unsafe-api-query-params
     pattern: |
       @app.get($PATH)
       def $FUNC_NAME($PARAMS):
           ... # Здесь используется параметр запроса
           $QUERY_PARAM = request.query_params[$QUERY_PARAM_NAME]
-    message: "Проверьте, что параметры запроса проверяются и безопасны."
+    message: "Убедитесь, что параметры запроса проверяются и безопасны."
     severity: WARNING
-    languages: [python]
-    metadata:
-      category: security
-      technology: fastapi
+    languages:
+      - python
 
-  - id: fastapi-unsafe-body
+  - id: unsafe-api-body
     pattern: |
       @app.post($PATH)
       def $FUNC_NAME(body: $BODY_TYPE):
           ...
-    message: "Проверьте, что тело запроса проверяется на безопасность."
+    message: "Убедитесь, что тело запроса проверяется на безопасность."
     severity: WARNING
-    languages: [python]
-    metadata:
-      category: security
-      technology: fastapi
+    languages:
+      - python
