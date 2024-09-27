@@ -2,20 +2,12 @@ pipeline {
     agent any
     stages {      
 
-        stage('Load .env file') {
-            steps {
-                withEnv(['SHELL=/bin/bash']) {
-                    sh script: 'source .env; env', returnStatus: true // Print loaded variables
-                }
-            }
-        }
-
         stage('Stop') {
             steps {
                 echo '[] Stopping the operation of the docker container'
                 sh 'echo $NAME'
-                sh "docker stop $NAME" 
-                sh "docker rm $NAME" 
+                sh 'docker stop ${env.NAME}' 
+                sh 'docker rm ${env.NAME}' 
             }
         }
 
