@@ -4,10 +4,10 @@ pipeline {
 
         stage('Load .env file') {
             steps {
-                envInject(script: '.env', enablePermissions: true) 
+                sh 'source .env'
             }
         }
-        
+
         stage('Stop') {
             steps {
                 echo '[*] Stopping the operation of the docker container'
