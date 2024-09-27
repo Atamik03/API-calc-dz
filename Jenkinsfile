@@ -5,12 +5,13 @@ pipeline {
     agent any
     stages {      
 
-        stage('Name')
+        stage('Name') { 
             steps {
                 script {
                     def name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
                 }
             }
+        }
 
         stage('Stop') {
             steps {
