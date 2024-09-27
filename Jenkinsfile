@@ -1,46 +1,35 @@
-def isContainerRunning() {
-    def runningContainers = sh(script: "docker ps -q --filter ancestor=api_calc", returnStdout: true).trim()
-    if (runningContainers != '') {
-        def stopResult = sh(script: "docker stop ${runningContainers}", returnStdout: true).trim()
-        return stopResult == '' 
-    }
-    return false
-}
-
 pipeline {
     agent any
-    stages {
+    stages {        
         stage('Stop') {
-            steps { 
-                when { expression { isContainerRunning() } } 
+            steps {
+                echo '[*] Stopping the operation of the docker container'
+                sh 'docker stop api_calc_container'
+                sh 'docker rm api_calc_container'
             }
         }
 
-        stage('BuildAndRun') {
+        stage('Building') {
             steps {
-                echo 'Building a new docker container'
-                sh script: 'docker build -t api_calc:latest .'
-
-                sh script: 'docker run -d -p 8000:8000 api_calc -i', returnStdout: true
-
-                script {
-                    containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
-                }
+                echo '[*] Building a new docker container'
+                sh 'docker build -t api_calc:latest .'
+                sh 'docker run -d -p 8000:8000 --name api_calc_container api_calc:latest'
             }
         }
 
         stage('Bandit') {
             when { expression { containerId != '' } }
             steps {
-                sh script: "docker exec -it ${containerId} bandit -r . -lll"
+                sh 'sleep 20'
+                sh 'docker run --rm api_calc:latest bandit -r . -lll'
             }
         }
 
         stage('Semgrep') {
             when { expression { containerId != '' } }
             steps {
-                sh script: "docker exec -it ${containerId} semgrep --config semgrep-config.yaml ."
-            }
+                sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
+            }  
         }
     }
 
