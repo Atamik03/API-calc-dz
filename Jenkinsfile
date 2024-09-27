@@ -5,7 +5,7 @@ pipeline {
         stage('Load .env file') {
             steps {
                 withEnv(['SHELL=/bin/bash']) {
-                    sh script: 'source .env', returnStatus: true 
+                    sh script: 'source .env; env', returnStatus: true // Print loaded variables
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Stop') {
             steps {
                 echo '[] Stopping the operation of the docker container'
-                sh "echo \$NAME" 
+                sh "echo \$NAME" // Print the NAME variable
                 sh "docker stop $NAME" 
                 sh "docker rm $NAME" 
             }
