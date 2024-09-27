@@ -18,7 +18,7 @@ pipeline {
         }
 
         stage('Bandit') {
-            when { expression { containerId != '' } }
+   
             steps {
                 sh 'sleep 20'
                 sh 'docker run --rm api_calc:latest bandit -r . -lll'
@@ -26,7 +26,7 @@ pipeline {
         }
 
         stage('Semgrep') {
-            when { expression { containerId != '' } }
+            
             steps {
                 sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
             }  
