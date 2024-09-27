@@ -1,56 +1,52 @@
-def isContainerRunning() {
-    def runningContainers = sh(script: "docker ps -q --filter ancestor=api_calc", returnStdout: true).trim()
-    if (runningContainers != '') {
-        sh script: "docker stop ${runningContainers}" 
-        return true 
-    }
-    return false 
-}
-
 pipeline {
     agent any
-    stages {
-        stage('Stop') {
-            when { expression { isContainerRunning() } } 
-            steps { 
-                sh script: 'ls -la'
-            }
-        }
+    
+    stages {        
 
-        stage('BuildAndRun') {
+	stage('test') {
+
             steps {
-                echo 'Building a new docker container'
-                sh script: 'docker build -t api_calc:latest .'
 
-                sh script: 'docker run -d -p 8000:8000 api_calc -i', returnStdout: true
-
-                script {
-                    containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
-                }
+                echo 'testing'
+                sh 'docker stop $(docker ps -q --filter ancestor=apicalc)' 
+                
             }
         }
 
-        stage('Bandit') {
-            when { expression { containerId != '' } }
+	stage('build') {
             steps {
-                sh script: "docker exec -it ${containerId} bandit -r . -lll"
+
+                echo 'building'
+                sh 'docker build -t apicalc:latest .'
+                sh 'docker run -d -p 8001:8001 apicalc'
+
             }
         }
 
-        stage('Semgrep') {
-            when { expression { containerId != '' } }
-            steps {
-                sh script: "docker exec -it ${containerId} semgrep --config semgrep-config.yaml ."
-            }
-        }
+	stage('bandit') {
+		
+	    steps {
+		
+		sh 'sleep 20'
+		sh 'docker run --rm apicalc:latest bandit -r . -lll'
+	
+	    }
+	}
+
+	stage('semgrep') {
+	    steps {
+	    	sh 'docker run --rm apicalc:latest semgrep --config semgrep-config.yaml .'
+	    }	
+	}
+        
     }
 
     post {
         success {
-            echo '\033[92m[+] Docker image built and pushed successfully!\033[39m'
+            echo 'Docker image built and pushed successfully!!'
         }
         failure {
-            echo '\033[91m[-] Something went wrong with the build.\033[39m'
+            echo 'Something went wrong with the build.'
         }
     }
 }
