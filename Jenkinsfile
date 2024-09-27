@@ -5,7 +5,7 @@ pipeline {
         stage('Read .env file') {
             steps {
                 script {
-                    env.putAll(readFile('.env').split('\n').collectEntries {
+                    env.putAll(readFile('/mnt/hgfs/Ob_Ubuntu/APICalc/.env').split('\n').collectEntries {
                     it.split('=')
                 })
                 }
