@@ -2,14 +2,9 @@ pipeline {
     agent any
     stages {      
 
-        stage('Read .env file') {
+        stage('Load .env file') {
             steps {
-                script {
-                    readFile(".env").split('\n').each { line ->
-                        def parts = line.split('=')
-                        env.put(parts[0].trim(), parts[1].trim())
-                    }
-                }
+                envInject(file: '.env', override: true) 
             }
         }
 
