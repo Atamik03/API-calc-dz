@@ -11,9 +11,8 @@ pipeline {
     agent any
     stages {
         stage('Stop') {
-            when { expression { isContainerRunning() } } 
             steps { 
-                sh script: 'ls -la'
+                when { expression { isContainerRunning() } } 
             }
         }
 
