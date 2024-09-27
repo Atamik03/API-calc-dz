@@ -12,9 +12,11 @@ pipeline {
             when { expression { !isContainerRunning() } }
             steps {
                 echo '[] Stopping the operation of the docker container'
-                if (sh(script: "docker ps -q --filter ancestor=api_calc", returnStdout: true).trim() != '') {
-                    sh 'docker stop $(docker ps -q --filter ancestor=api_calc)'
-                }
+                sh '''
+                    if [[ "$(docker ps -q --filter ancestor=api_calc)" != "" ]]; then
+                        docker stop $(docker ps -q --filter ancestor=api_calc)
+                    fi
+                '''
             }
         }
 
