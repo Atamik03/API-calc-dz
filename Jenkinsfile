@@ -1,3 +1,13 @@
+import groovy.text.GStringTemplateEngine
+
+def getName() {
+    def template = '''\
+NAME=$(grep -E '^NAME=' .env | cut -d'=' -f2)
+'''
+    def engine = new GStringTemplateEngine()
+    return engine.createTemplate(template).make().toString()
+}
+
 pipeline {
     agent any
     stages {      
@@ -5,9 +15,8 @@ pipeline {
         stage('Stop') {
             steps {
                 echo '[] Stopping the operation of the docker container'
-                sh 'cat .env'
-                sh "docker stop ${env.NAME}" 
-                sh "docker rm ${env.NAME}" 
+                sh "docker stop $NAME" 
+                sh "docker rm $NAME" 
             }
         }
 
