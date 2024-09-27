@@ -1,8 +1,6 @@
 def isContainerRunning() {
-    def output = sh(script: """
-        docker inspect --format='{{.State.Running}}' \$(docker ps -q --filter ancestor=api_calc)
-    """, returnStdout: true)
-    return output.trim() == 'true' || output.trim() == '' 
+    def runningContainers = sh(script: "docker ps -q --filter ancestor=api_calc", returnStdout: true).trim()
+    return runningContainers != ''
 }
 
 pipeline {
@@ -11,7 +9,7 @@ pipeline {
         stage('Stop') {
             when { expression { !isContainerRunning() } }
             steps {
-                echo '[] Stopping the operation of the docker container'
+                echo 'Stopping the operation of the docker container'
                 sh '''
                     if [[ "$(docker ps -q --filter ancestor=api_calc)" != "" ]]; then
                         docker stop $(docker ps -q --filter ancestor=api_calc)
@@ -22,7 +20,7 @@ pipeline {
 
         stage('BuildAndRun') {
             steps {
-                echo '[] Building a new docker container'
+                echo 'Building a new docker container'
                 sh 'docker build -t api_calc:latest .'
                 sh 'docker run -d -p 8000:8000 api_calc'
             }
