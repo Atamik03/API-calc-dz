@@ -4,7 +4,7 @@ pipeline {
 
         stage('Load .env file') {
             steps {
-                envInject(fileSource: '.env', overrideExistingVariables: true) 
+                envInject(scriptFilePath: '.env', override: true) 
             }
         }
 
