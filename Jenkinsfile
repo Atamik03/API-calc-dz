@@ -6,6 +6,7 @@ pipeline {
             steps {
                 withEnv(['SHELL=/bin/bash']) {
                     sh script: 'source .env; env', returnStatus: true // Print loaded variables
+                    sh script: 'env', returnStatus: true // Print again for confirmation
                 }
             }
         }
