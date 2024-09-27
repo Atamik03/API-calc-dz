@@ -1,24 +1,13 @@
-// name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
-
-
 pipeline {
     agent any
     stages {      
-
-        stage('Name') { 
-            steps {
-                script {
-                    def name = sh(returnStdout: true, script: 'grep -E "^NAME=" .env | cut -d"=" -f2').trim()
-                }
-            }
-        }
 
         stage('Stop') {
             steps {
                 script {
                     echo '[] Stopping the operation of the docker container'
-                    sh "docker stop $name" 
-                    sh "docker rm $name" 
+                    sh 'docker stop api_calc_container' 
+                    sh 'docker rm api_calc_container' 
                 }
             }
         }
@@ -26,21 +15,21 @@ pipeline {
         stage('Building') {
             steps {
                 echo '[] Building a new docker container'
-                sh "docker build -t $name:latest ."
-                sh "docker run -d -p ${env.RM_PORT}:${env.RM_PORT} --name ${env.NAME} ${env.D_NAME}:latest" 
+                sh 'docker build -t api_calc_container:latest .'
+                sh 'docker run -d -p 8000:8000 --name api_calc_container api_calc:latest' 
             }
         }
 
         stage('Bandit') {
             steps {
                 sh 'sleep 20'
-                sh "docker run --rm ${env.D_NAME}:latest bandit -r . -lll"
+                sh 'docker run --rm api_calc:latest bandit -r . -lll'
             }
         }
 
         stage('Semgrep') {
             steps {
-                sh "docker run --rm ${env.D_NAME}:latest semgrep --config semgrep-config.yaml ."
+                sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
             }  
         }
     }
