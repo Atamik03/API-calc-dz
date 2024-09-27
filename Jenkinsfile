@@ -5,9 +5,8 @@ pipeline {
         stage('Stop') {
             steps {
                 echo '[] Stopping the operation of the docker container'
-                sh 'echo $NAME'
-                sh 'docker stop ${env.NAME}' 
-                sh 'docker rm ${env.NAME}' 
+                sh "docker stop ${env.NAME}" 
+                sh "docker rm ${env.NAME}" 
             }
         }
 
