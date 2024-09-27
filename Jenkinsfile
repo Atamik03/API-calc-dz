@@ -1,52 +1,56 @@
+def isContainerRunning() {
+    def runningContainers = sh(script: "docker ps -q --filter ancestor=api_calc", returnStdout: true).trim()
+    if (runningContainers != '') {
+        def stopResult = sh(script: "docker stop ${runningContainers}", returnStdout: true).trim()
+        return stopResult == '' 
+    }
+    return false
+}
+
 pipeline {
     agent any
-    
-    stages {        
-
-	stage('test') {
-
-            steps {
-
-                echo 'testing'
-                sh 'docker stop $(docker ps -q --filter ancestor=apicalc)' 
-                
+    stages {
+        stage('Stop') {
+            when { expression { isContainerRunning() } } 
+            steps { 
+                sh script: 'ls -la'
             }
         }
 
-	stage('build') {
+        stage('BuildAndRun') {
             steps {
+                echo 'Building a new docker container'
+                sh script: 'docker build -t api_calc:latest .'
 
-                echo 'building'
-                sh 'docker build -t apicalc:latest .'
-                sh 'docker run -d -p 8001:8001 apicalc'
+                sh script: 'docker run -d -p 8000:8000 api_calc -i', returnStdout: true
 
+                script {
+                    containerId = sh(script: 'docker ps -aq --filter ancestor=api_calc', returnStdout: true).trim()
+                }
             }
         }
 
-	stage('bandit') {
-		
-	    steps {
-		
-		sh 'sleep 20'
-		sh 'docker run --rm apicalc:latest bandit -r . -lll'
-	
-	    }
-	}
+        stage('Bandit') {
+            when { expression { containerId != '' } }
+            steps {
+                sh script: "docker exec -it ${containerId} bandit -r . -lll"
+            }
+        }
 
-	stage('semgrep') {
-	    steps {
-	    	sh 'docker run --rm apicalc:latest semgrep --config semgrep-config.yaml .'
-	    }	
-	}
-        
+        stage('Semgrep') {
+            when { expression { containerId != '' } }
+            steps {
+                sh script: "docker exec -it ${containerId} semgrep --config semgrep-config.yaml ."
+            }
+        }
     }
 
     post {
         success {
-            echo 'Docker image built and pushed successfully!!'
+            echo '\033[92m[+] Docker image built and pushed successfully!\033[39m'
         }
         failure {
-            echo 'Something went wrong with the build.'
+            echo '\033[91m[-] Something went wrong with the build.\033[39m'
         }
     }
 }
