@@ -4,7 +4,7 @@ pipeline {
 
         stage('Load .env file') {
             steps {
-                sh 'source .env'
+                sh script: 'source .env', returnStatus: true
             }
         }
 
