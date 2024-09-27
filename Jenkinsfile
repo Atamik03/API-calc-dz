@@ -5,10 +5,10 @@ pipeline {
         stage('Read .env file') {
             steps {
                 script {
-                    env.putAll(readFile(".env").split('\n').collectEntries { line -> 
-                        def parts = line.split('=') 
-                        [(parts[0].trim()): parts[1].trim()] 
-                    })
+                    readFile(".env").split('\n').each { line ->
+                        def parts = line.split('=')
+                        env.put(parts[0].trim(), parts[1].trim())
+                    }
                 }
             }
         }
