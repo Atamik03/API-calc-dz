@@ -4,7 +4,9 @@ pipeline {
 
         stage('Load .env file') {
             steps {
-                sh script: 'source .env', returnStatus: true, executable: '/bin/bash' 
+                withEnv(['SHELL=/bin/bash']) {
+                    sh script: 'source .env', returnStatus: true 
+                }
             }
         }
 
