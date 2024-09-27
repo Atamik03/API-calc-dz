@@ -1,6 +1,7 @@
-import uvicorn
+import uvicorn, os
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from dotenv import load_dotenv
 
 
 app = FastAPI()
@@ -32,10 +33,13 @@ def plus(x: float, y:float) -> float:
         return result
     except Exception:
         raise HTTPException
-
+    
 
 def main() -> None:
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    load_dotenv(dotenv_path='.env')
+    port = os.getenv('RM_PORT')
+    host = os.getenv('RM_HOST')
+    uvicorn.run("main:app", host, port, reload=True)
 
 
 if __name__ == "__main__":

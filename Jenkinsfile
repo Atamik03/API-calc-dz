@@ -1,19 +1,30 @@
 pipeline {
     agent any
-    stages {        
+    stages {      
+
+        stage('Read .env file') {
+            steps {
+                script {
+                    env.putAll(readFile('.env').split('\n').collectEntries {
+                    it.split('=')
+                })
+                }
+            } 
+        }
+
         stage('Stop') {
             steps {
                 echo '[*] Stopping the operation of the docker container'
-                sh 'docker stop api_calc_container'
-                sh 'docker rm api_calc_container'
+                sh 'docker stop  ${env.NAME}'
+                sh 'docker rm  ${env.NAME}'
             }
         }
 
         stage('Building') {
             steps {
                 echo '[*] Building a new docker container'
-                sh 'docker build -t api_calc:latest .'
-                sh 'docker run -d -p 8000:8000 --name api_calc_container api_calc:latest'
+                sh 'docker build -t ${env.D_NAME}:latest .'
+                sh 'docker run -d -p ${env.RM_PORT}:${env.RM_PORT} --name  ${env.NAME} ${env.D_NAME}:latest'
             }
         }
 
@@ -21,24 +32,15 @@ pipeline {
    
             steps {
                 sh 'sleep 20'
-                sh 'docker run --rm api_calc:latest bandit -r . -lll'
+                sh 'docker run --rm ${env.D_NAME}:latest bandit -r . -lll'
             }
         }
 
         stage('Semgrep') {
-            
-            steps {
-                sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
-            }  
-        }
-    }
 
-    post {
-        success {
-            echo '\033[92m[+] Docker image built and pushed successfully!\033[39m'
-        }
-        failure {
-            echo '\033[91m[-] Something went wrong with the build.\033[39m'
+            steps {
+                sh 'docker run --rm ${env.D_NAME}:latest semgrep --config semgrep-config.yaml .'
+            }  
         }
     }
 }
