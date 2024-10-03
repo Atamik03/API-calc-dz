@@ -35,7 +35,7 @@ pipeline {
 
        stage('Trivy') {
             steps {
-                sh 'docker run --rm api_calc:latest trivy --format table --severity HIGH,CRITICAL'
+                sh 'trivy images api_calc:latest --format table --severity HIGH,CRITICAL'
             }
        }
     }
