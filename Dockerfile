@@ -6,7 +6,8 @@ ARG RM_PORT
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt \ 
     bandit \
-    semgrep
+    semgrep \
+    trivy
 
 EXPOSE $RM_PORT
 CMD ["python", "main.py"]

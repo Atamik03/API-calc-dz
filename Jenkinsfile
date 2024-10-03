@@ -15,7 +15,7 @@ pipeline {
         stage('Building') {
             steps {
                 echo '[] Building a new docker container'
-                sh 'docker build -t api_calc_container:latest .'
+                sh 'docker build -t api_calc:latest .'
                 sh 'docker run -d -p 8000:8000 --name api_calc_container api_calc:latest' 
             }
         }
@@ -31,6 +31,13 @@ pipeline {
             steps {
                 sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
             }  
+        }
+
+        stage('Trivy') {
+            steps {
+                sh 'docker run --rm -v $(pwd):/app aquasec/trivy:latest  --no-progress --quiet --format table --output /app/trivy_report.txt /app'
+                sh 'if [ -f trivy_report.txt ]; then cat trivy_report.txt; fi'
+            }
         }
     }
 }
