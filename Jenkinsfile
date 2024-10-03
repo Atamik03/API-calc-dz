@@ -35,7 +35,7 @@ pipeline {
 
         stage('Trivy') {
             steps {
-                sh 'docker run --rm api_calc:latest trivy --no-progress --quiet --format table --output /app/trivy_report.txt /app'
+                sh 'docker run --rm api_calc:latest trivy -q --format table --output /app/trivy_report.txt /app'
                 sh 'if [ -f trivy_report.txt ]; then cat trivy_report.txt; fi'
             }
         }
