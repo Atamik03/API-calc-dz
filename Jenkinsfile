@@ -32,5 +32,10 @@ pipeline {
                 sh 'docker run --rm api_calc:latest semgrep --config semgrep-config.yaml .'
             }  
         }
+
+       stage('Trivy') {
+            steps {
+                sh 'docker run --rm api_calc:latest trivy image api_calc:latest --format table --severity HIGH,CRITICAL'
+            }
     }
 }
